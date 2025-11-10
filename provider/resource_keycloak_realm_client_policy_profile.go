@@ -51,6 +51,8 @@ func resourceKeycloakRealmClientPolicyProfile() *schema.Resource {
 
 func resourceKeycloakRealmClientPolicyProfileUpdate(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	keycloakClient := meta.(*keycloak.KeycloakClient)
+	keycloakClient.Mutex.Lock("resourceKeycloakRealmClientPolicyProfile")
+	defer keycloakClient.Mutex.Unlock("resourceKeycloakRealmClientPolicyProfile")
 	profile := mapFromDataToRealmClientPolicyProfile(data)
 	realmId := profile.RealmId
 	realmClientPolicyProfiles, err := keycloakClient.GetAllRealmClientPolicyProfiles(ctx, realmId)
@@ -63,7 +65,6 @@ func resourceKeycloakRealmClientPolicyProfileUpdate(ctx context.Context, data *s
 			realmClientPolicyProfiles.Profiles[i] = *profile
 		}
 	}
-
 	err = keycloakClient.UpdateRealmClientPolicyProfiles(ctx, realmId, realmClientPolicyProfiles)
 	if err != nil {
 		return diag.FromErr(err)
@@ -100,6 +101,8 @@ func resourceKeycloakRealmClientPolicyProfileDelete(ctx context.Context, data *s
 
 func resourceKeycloakRealmClientPolicyProfileCreate(ctx context.Context, data *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	keycloakClient := meta.(*keycloak.KeycloakClient)
+	keycloakClient.Mutex.Lock("resourceKeycloakRealmClientPolicyProfile")
+	defer keycloakClient.Mutex.Unlock("resourceKeycloakRealmClientPolicyProfile")
 	profile := mapFromDataToRealmClientPolicyProfile(data)
 
 	realmId := profile.RealmId
